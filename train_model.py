@@ -6,10 +6,8 @@ from sklearn.metrics import accuracy_score
 
 # Carregar os dados
 data_dict = pickle.load(open('./data.pickle', 'rb'))
-data = np.array(data_dict['data'], dtype=np.int32)
-labels = np.array(data_dict['labels'], dtype=np.int32)
-
-print(labels)
+data = np.array(data_dict['data'])
+labels = np.array(data_dict['labels'])
 
 # Dividir os dados em conjuntos de treino e teste
 x_train, x_test, y_train, y_test = train_test_split(
@@ -17,10 +15,12 @@ x_train, x_test, y_train, y_test = train_test_split(
 
 # Definir a arquitetura da rede neural
 model = tf.keras.Sequential([
-    # A entrada agora é o número de dimensões dos landmarks
-    tf.keras.layers.Dense(64, activation='relu', input_shape=(len(data[0]),)),
+    tf.keras.layers.Flatten(input_shape=(21, 2)),
+    tf.keras.layers.Dense(64, activation='relu'),
     tf.keras.layers.Dense(32, activation='relu'),
-    # Camada de saída com ativação softmax para classificação multiclasses
+    tf.keras.layers.Dense(16, activation='relu'),
+    tf.keras.layers.Dense(8, activation='relu'),
+    # tf.keras.layers.Dropout(0.2),
     tf.keras.layers.Dense(np.max(labels) + 1, activation='softmax')
 ])
 
@@ -29,7 +29,7 @@ model.compile(optimizer='adam',
               loss='sparse_categorical_crossentropy', metrics=['accuracy'])
 
 # Treinar o modelo
-model.fit(x_train, y_train, epochs=10, batch_size=32, validation_split=0.1)
+model.fit(x_train, y_train, epochs=50, batch_size=32, validation_split=0.1)
 
 # Avaliar o modelo no conjunto de teste
 y_predict = np.argmax(model.predict(x_test), axis=1)
