@@ -2,3 +2,4 @@ venv
 data
 data.pickle
 model.p
+model.h5
